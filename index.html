@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>Check’s mal! – Workshop gegen Cybermobbing</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="logos">
+      <img src="assets/kulturhilfswerk.png" alt="Kulturhilfswerk" class="logo">
+      <img src="assets/meko-sz.png" alt="Medienkompetenzzentrum Steglitz-Zehlendorf" class="logo logo-wide">
+    </div>
+
+    <div class="headline">
+      <div class="kicker">Check’s mal!</div>
+      <h1>Workshop gegen Cybermobbing</h1>
+    </div>
+
+    <div class="hud">
+      <div class="coin">
+        <span class="coin-dot"></span>
+        <span class="coin-text"><strong>Coins:</strong> <span id="coins">0</span></span>
+        <span class="level-badge" id="levelBadge"><span class="lvl-emoji">🧩</span><span class="lvl-name">Newbie</span></span>
+      </div>
+
+      <div class="progress-wrap" aria-label="Workshop-Fortschritt">
+        <div class="progress-row">
+          <div class="progress-label-mini">Fortschritt</div>
+          <div class="progress-bar-auto markers" id="progressBar">
+            <div class="progress-fill-auto" id="progressAutoFill" style="width:0%;"></div>
+            <span class="mk" style="left:11.111%;"></span>
+            <span class="mk" style="left:22.222%;"></span>
+            <span class="mk major" style="left:33.333%;"></span>
+            <span class="mk" style="left:44.444%;"></span>
+            <span class="mk major" style="left:55.555%;"></span>
+            <span class="mk" style="left:66.666%;"></span>
+            <span class="mk" style="left:77.777%;"></span>
+            <span class="mk major" style="left:88.888%;"></span>
+          </div>
+          <div class="progress-pct" id="progressPct">0%</div>
+        </div>
+
+        <div class="timer-actions">
+          <button class="btn ghost small" type="button" onclick="toggleTimer()" id="timerBtn">▶︎ Start</button>
+          <button class="btn ghost small" type="button" onclick="confirmResetTimer()">↺ Reset</button>
+          <button class="btn ghost small" type="button" onclick="toggleSound()" id="soundBtn">🔊 Sound</button>
+        </div>
+
+        <!-- Teacher quick-set (hidden until expanded) -->
+        <details class="teacher-tools">
+          <summary>Lehrkraft-Tools (Fortschritt setzen)</summary>
+          <div class="teacher-inner">
+            <div class="teacher-row">
+              <button class="btn ghost tiny" type="button" onclick="setProgressPct(25)">25%</button>
+              <button class="btn ghost tiny" type="button" onclick="setProgressPct(50)">50%</button>
+              <button class="btn ghost tiny" type="button" onclick="setProgressPct(75)">75%</button>
+              <button class="btn ghost tiny" type="button" onclick="setProgressPct(90)">90%</button>
+            </div>
+            <div class="teacher-row teacher-slider">
+              <label for="pctSlider">Fein:</label>
+              <input id="pctSlider" type="range" min="0" max="100" value="0" step="1" oninput="setProgressPct(this.value, true)">
+              <span class="teacher-val"><span id="pctSliderVal">0</span>%</span>
+            </div>
+            <div class="teacher-hint">
+              Tipp: Wenn jemand Reset drückt → einmal auf „50%“ klicken und du bist sofort wieder ungefähr in der Mitte.
+            </div>
+          </div>
+        </details>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="grid">
+
+  <section class="card card-main">
+    <div class="frame">
+      <iframe
+        src="https://docs.google.com/presentation/d/e/2PACX-1vRyw8wOVE8gTlNGs8T8746UkD2NOOoYboUWZ0s0szXgCuHFXA_q9bHGHolJXRcsHPEuDlIKVEVuhbGV/pubembed?start=false&loop=false&delayms=3000"
+        allowfullscreen>
+      </iframe>
+    </div>
+  </section>
+
+  <aside class="card card-side">
+    <div class="card-head">
+      <h2>Kahoot (Lehrkraft)</h2>
+      <p class="note">Du startest live → PIN &amp; QR-Code entstehen automatisch.</p>
+    </div>
+
+    <a class="btn"
+       href="https://play.kahoot.it/v2/?quizId=deb03ff0-3f6c-4c92-8f96-a48c7a5e380e&hostId=a01ef7ea-8f32-4a33-a6a6-d3e15685d2b1"
+       target="_blank" rel="noreferrer">
+      Kahoot starten (Host)
+    </a>
+
+    <div class="mini">
+      <div class="mini-title">Coins sammeln</div>
+      <button class="btn ghost coin-big" type="button" onclick="addCoin()">+1 COIN</button>
+      <button class="btn ghost" type="button" onclick="confirmResetCoins()">Reset</button>
+    </div>
+  </aside>
+
+</main>
+
+<div class="toast" id="levelToast">🔥 LEVEL UP!</div>
+<div class="toast toast-highscore" id="highscoreToast">🏆 WORKSHOP-HIGHSCORE GEKNACKT! 🔥</div>
+<div class="toast toast-boss" id="bossToast">🐲 BOSS BESIEGT!</div>
+
+<div id="confettiLayer" class="confetti-layer" aria-hidden="true"></div>
+
+<div class="boss-overlay" id="bossOverlay" aria-hidden="true">
+  <div class="boss-card">
+    <div class="boss-title">🐲 BOSS BESIEGT! 🏆</div>
+    <div class="boss-sub">100 Coins erreicht — ihr wart unfassbar stark.</div>
+    <div class="boss-badges">
+      <span class="boss-chip">🚀 Ultra</span>
+      <span class="boss-chip">🔥 Team-Mode</span>
+      <span class="boss-chip">🛡️ Upstander-Energy</span>
+    </div>
+    <button class="btn ghost boss-close" type="button" onclick="closeBoss()">Weiter</button>
+  </div>
+</div>
+
+<script>
+  const TIMER_TOTAL_SECONDS = 90 * 60;
+  const HIGHSCORE_TOAST_MS = 7000; 
+  // ===== RESET-SCHUTZ (Bestätigung) =====
+  function confirmResetTimer(){
+    if(confirm("Fortschritt wirklich zurücksetzen?")) resetTimer();
+  }
+  function confirmResetCoins(){
+    if(confirm("Coins wirklich zurücksetzen?")) resetCoins();
+  }
+// shortened from 10s
+
+  const levels = [
+    { min: 0,  name: "Newbie",        emoji: "🧩" },
+    { min: 10, name: "Checker",       emoji: "👀" },
+    { min: 20, name: "Helper",        emoji: "🤝" },
+    { min: 30, name: "Upstander",     emoji: "🛡️" },
+    { min: 40, name: "Pro Ally",      emoji: "🔥" },
+    { min: 50, name: "Squad Leader",  emoji: "🎮" },
+    { min: 60, name: "Shield Master", emoji: "🧱" },
+    { min: 70, name: "Glow Mode",     emoji: "✨" },
+    { min: 80, name: "Legend",        emoji: "🏆" },
+    { min: 90, name: "Mythic",        emoji: "🐉" },
+    { min: 100,name: "Ultra",         emoji: "🚀" }
+  ];
+
+  let coinCount = 0;
+  let levelIndex = 0;
+  let highscoreShown = false;
+  let bossShown = false;
+
+  let soundOn = true;
+  try {
+    const saved = localStorage.getItem("checksmal_soundOn");
+    if (saved !== null) soundOn = saved === "true";
+  } catch(e){}
+
+  function updateSoundUI(){
+    document.getElementById("soundBtn").textContent = soundOn ? "🔊 Sound" : "🔇 Sound";
+  }
+  updateSoundUI();
+
+  function toggleSound(){
+    soundOn = !soundOn;
+    updateSoundUI();
+    try { localStorage.setItem("checksmal_soundOn", String(soundOn)); } catch(e){}
+  }
+
+  // WebAudio mini-synth (offline)
+  let _ctx = null;
+  function ctx(){
+    if(!_ctx) _ctx = new (window.AudioContext || window.webkitAudioContext)();
+    return _ctx;
+  }
+  function tone(freq, start, dur, type="triangle", gainVal=0.055){
+    if(!soundOn) return;
+    try{
+      const c = ctx();
+      const osc = c.createOscillator();
+      const gain = c.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, start);
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(gainVal, start + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+      osc.connect(gain);
+      gain.connect(c.destination);
+      osc.start(start);
+      osc.stop(start + dur + 0.02);
+    }catch(e){}
+  }
+
+  function playLevelUpSound(){
+    if(!soundOn) return;
+    const c = ctx();
+    const t0 = c.currentTime + 0.01;
+    tone(523.25, t0,       0.12, "square", 0.045);
+    tone(659.25, t0+0.10,  0.12, "square", 0.045);
+    tone(783.99, t0+0.20,  0.12, "square", 0.045);
+    tone(1046.5, t0+0.32,  0.16, "triangle", 0.055);
+    tone(1568.0, t0+0.42,  0.08, "triangle", 0.03);
+    tone(2093.0, t0+0.50,  0.10, "triangle", 0.028);
+  }
+
+  function playHighscoreSound(){
+    if(!soundOn) return;
+    const c = ctx();
+    const t0 = c.currentTime + 0.01;
+    tone(392.0,  t0,       0.18, "square", 0.05);
+    tone(523.25, t0+0.16,  0.18, "square", 0.05);
+    tone(659.25, t0+0.32,  0.20, "square", 0.05);
+    tone(783.99, t0+0.50,  0.24, "triangle", 0.06);
+    tone(1046.5, t0+0.72,  0.30, "triangle", 0.06);
+    tone(783.99, t0+0.76,  0.26, "triangle", 0.035);
+    tone(1568.0, t0+1.06,  0.14, "triangle", 0.03);
+    tone(2093.0, t0+1.18,  0.16, "triangle", 0.028);
+    tone(2637.0, t0+1.34,  0.18, "triangle", 0.024);
+  }
+
+  function playBossSound(){
+    if(!soundOn) return;
+    const c = ctx();
+    const t0 = c.currentTime + 0.01;
+    tone(261.63, t0,       0.16, "sawtooth", 0.03);
+    tone(329.63, t0+0.14,  0.16, "sawtooth", 0.03);
+    tone(392.0,  t0+0.28,  0.18, "square",   0.045);
+    tone(523.25, t0+0.44,  0.22, "square",   0.05);
+    tone(659.25, t0+0.64,  0.26, "triangle", 0.06);
+    tone(783.99, t0+0.86,  0.32, "triangle", 0.06);
+    tone(1046.5, t0+1.12,  0.45, "triangle", 0.06);
+    tone(2093.0, t0+1.36,  0.18, "triangle", 0.03);
+  }
+
+  function getLevelIndexForCoins(c){ let i=0; for(let k=0;k<levels.length;k++){ if(c>=levels[k].min) i=k; } return i; }
+  function updateLevelUI(){
+    const lvl = levels[levelIndex] || levels[levels.length-1];
+    document.querySelector("#levelBadge .lvl-emoji").textContent = lvl.emoji;
+    document.querySelector("#levelBadge .lvl-name").textContent = lvl.name;
+  }
+  function pulseLevelBadge(){ const b=document.getElementById("levelBadge"); b.classList.remove("pulse"); void b.offsetWidth; b.classList.add("pulse"); }
+  function showToast(id, txt, ms=1500){ const t=document.getElementById(id); if(txt) t.textContent=txt; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),ms); }
+
+  function confettiBurst(mult=1){
+    const layer=document.getElementById("confettiLayer");
+    const count=Math.round(26*mult);
+    const colors=["#6d5efc","#00d1b2","#ffcc00","#ff5a96","#2e90fa","#12b76a"];
+    for(let i=0;i<count;i++){
+      const p=document.createElement("span");
+      p.className="confetti";
+      const size=6+Math.random()*8;
+      p.style.width=size+"px";
+      p.style.height=(size*0.6)+"px";
+      p.style.left=(44+(Math.random()*12))+"vw";
+      p.style.background=colors[Math.floor(Math.random()*colors.length)];
+      p.style.transform=`rotate(${Math.random()*360}deg)`;
+      p.style.setProperty("--dx",(Math.random()*280-140)+"px");
+      p.style.setProperty("--dr",(Math.random()*900-450)+"deg");
+      p.style.setProperty("--dur",(1100+Math.random()*900)+"ms");
+      layer.appendChild(p);
+      setTimeout(()=>p.remove(),2600);
+    }
+  }
+
+  function addCoin(){
+    coinCount++;
+    document.getElementById("coins").textContent = coinCount;
+
+    const ni = getLevelIndexForCoins(coinCount);
+    if(ni>levelIndex){
+      levelIndex=ni;
+      updateLevelUI();
+      playLevelUpSound();
+      confettiBurst(1.1);
+      showToast("levelToast", `${levels[levelIndex].emoji} LEVEL UP!`, 2000);
+      pulseLevelBadge();
+    }
+
+    if(coinCount>=40 && !highscoreShown){
+      highscoreShown=true;
+      playHighscoreSound();
+      confettiBurst(2.0);
+      showToast("highscoreToast", "🏆 WORKSHOP-HIGHSCORE GEKNACKT! 🔥", HIGHSCORE_TOAST_MS);
+      setTimeout(()=>confettiBurst(1.6), 900);
+      setTimeout(()=>confettiBurst(1.4), 1900);
+      setTimeout(()=>confettiBurst(1.2), 3200);
+      setTimeout(()=>confettiBurst(1.0), 5200);
+    }
+
+    if(coinCount>=100 && !bossShown){
+      bossShown=true;
+      playBossSound();
+      confettiBurst(2.5);
+      showToast("bossToast", "🐲 BOSS BESIEGT! 🏆", 4200);
+      openBoss();
+      setTimeout(()=>confettiBurst(2.0), 650);
+      setTimeout(()=>confettiBurst(1.8), 1350);
+    }
+  }
+
+  function resetCoins(){
+    coinCount=0; levelIndex=0; highscoreShown=false; bossShown=false;
+    document.getElementById("coins").textContent=coinCount; updateLevelUI();
+  }
+
+  function openBoss(){ document.getElementById("bossOverlay").classList.add("show"); }
+  function closeBoss(){ document.getElementById("bossOverlay").classList.remove("show"); }
+
+  // ===== Progress timer (hidden) =====
+  let elapsedSeconds = 0;
+  let timerRunning = false;
+  let timerHandle = null;
+
+  function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
+
+  function renderProgress(){
+    const pct = Math.min(100, Math.round((elapsedSeconds / TIMER_TOTAL_SECONDS) * 100));
+    document.getElementById("progressAutoFill").style.width = pct + "%";
+    document.getElementById("progressPct").textContent = pct + "%";
+    const slider = document.getElementById("pctSlider");
+    slider.value = pct;
+    document.getElementById("pctSliderVal").textContent = pct;
+  }
+
+  // Teacher: set progress to a given percent (updates internal time)
+  function setProgressPct(pct, fromSlider=false){
+    const p = clamp(Number(pct), 0, 100);
+    elapsedSeconds = Math.round((p/100) * TIMER_TOTAL_SECONDS);
+    renderProgress();
+    if(!fromSlider){
+      // tiny visual feedback
+      showToast("levelToast", `🧭 Fortschritt gesetzt: ${p}%`, 1400);
+    }
+  }
+
+  function tick(){
+    if(elapsedSeconds < TIMER_TOTAL_SECONDS){
+      elapsedSeconds++;
+      renderProgress();
+      if(elapsedSeconds === TIMER_TOTAL_SECONDS){
+        tone(329.63, ctx().currentTime + 0.01, 0.20, "triangle", 0.02);
+        showToast("levelToast","⏱️ Zeit!",1800);
+        confettiBurst(1);
+        toggleTimer(false);
+      }
+    }
+  }
+
+  function toggleTimer(force){
+    const btn=document.getElementById("timerBtn");
+    const want=(force===true)?true:(force===false)?false:!timerRunning;
+    if(want && !timerRunning){
+      timerRunning=true; btn.textContent="⏸ Pause"; timerHandle=setInterval(tick,1000);
+    } else if(!want && timerRunning){
+      timerRunning=false; btn.textContent="▶︎ Start"; clearInterval(timerHandle); timerHandle=null;
+    }
+  }
+
+  function resetTimer(){
+    toggleTimer(false);
+    elapsedSeconds=0;
+    renderProgress();
+  }
+
+  updateLevelUI();
+  renderProgress();
+</script>
+
+</body>
+</html>
